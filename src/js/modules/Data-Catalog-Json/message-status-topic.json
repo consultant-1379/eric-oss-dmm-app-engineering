@@ -1,0 +1,6 @@
+{
+  "messageBusId":1,
+  "name":"status",
+  "encoding":"JSON",
+  "specificationReference":"specref1"
+}

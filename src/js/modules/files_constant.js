@@ -1,0 +1,11 @@
+export const dataSpace = "5G_5";
+export const dataCategory = "PM_COUNTERs_5";
+export const dataProviderName = "v22";
+export const schemaName = "SCHMNM";
+export const schemaVersion = 2;
+export const dataServiceName = "dsName_9";
+export const Namespace = `${__ENV.Namespace}`;
+export const bdr_s1_name= "eric-data-object-storage-mn";
+export const mb_s1_name= "eric-oss-dmm-kf-op-sz-kafka-bootstrap";
+export const bdr_endpoint_name='http://eric-data-object-storage-mn:9000';
+export const files_prefix = "dmm-app-eng-files-"

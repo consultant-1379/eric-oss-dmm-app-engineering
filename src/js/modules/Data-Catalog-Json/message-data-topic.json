@@ -1,0 +1,7 @@
+{
+  "messageBusId":1,
+  "name":"data1",
+  "encoding":"JSON",
+  "messageStatusTopicId": 1
+
+}

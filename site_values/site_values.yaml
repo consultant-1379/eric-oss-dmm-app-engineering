@@ -1,0 +1,15 @@
+env:
+  GAS_URL: "GAS_HOST_REPLACE"
+  KAFKA_SERVER: "eric-oss-dmm-kf-op-sz-kafka-bootstrap:9093"
+  TLS: true
+kafka-wrapper:
+  enabled: true
+  kafka:
+    bootstrap_servers: eric-oss-dmm-kf-op-sz-kafka-bootstrap:9093
+    load: true
+    KafkaIngressWrapper:
+      enable: true
+  env:
+    BOOTSTRAP_EXTERNAL: "KAFKA_BOOTSTRAP_HOST_REPLACE"
+    IAM_URI: "IAM_HOST_REPLACE"
+    TLS: true

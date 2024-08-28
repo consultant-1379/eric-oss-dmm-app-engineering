@@ -1,0 +1,12 @@
+export const streams_dataSpace = "4G_5";
+export const streams_dataCategory = "PM_COUNTERs_6";
+export const streams_dataProviderTypeId = "v222";
+export const streams_schemaName = "SCHMNMM";
+export const streams_schemaVersion = 2;
+export const streams_dataServiceName = "dsName_91";
+export const streams_topic = "dmm-app-eng-topic"
+export const Namespace = `${__ENV.Namespace}`;
+export const bdr_s1_name= "eric-data-object-storage-mn";
+export const mb_s1_name= "eric-oss-dmm-kf-op-sz-kafka-bootstrap";
+export const streams_dataProviderName = "dpNameStreams";
+export  const streams_prefix = "dmm-app-eng-streams-"

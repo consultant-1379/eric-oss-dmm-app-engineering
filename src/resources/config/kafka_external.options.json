@@ -1,0 +1,16 @@
+{
+    "insecureSkipTLSVerify": true,
+    "teardownTimeout": "180s",
+    "setupTimeout": "180s",
+      "scenarios": {
+      "kafka_native_consume_external": {
+          "exec": "kafka_native_consume_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "iterations": 1
+        }
+        
+    
+      }
+    
+    }

@@ -1,0 +1,4 @@
+{
+  "schema": "{\"type\":\"record\",\"name\":\"SmallRecord\",\"namespace\":\"com.ericsson.idun.small.notification\",\"fields\":[{\"name\":\"id\",\"type\":\"string\",\"default\":1},{\"name\":\"name\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"default\":\"Hello\"},{\"name\":\"dept\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"default\":\"World\"}]}"
+}
+

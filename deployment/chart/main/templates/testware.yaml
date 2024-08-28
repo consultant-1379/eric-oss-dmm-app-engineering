@@ -1,0 +1,145 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Chart.Name }}"
+  labels:
+    {{- include "eric-oss-dmm.labels" . | nindent 4 }}
+    {{- include "eric-oss-dmm.service-mesh-inject" .| nindent 4 }}
+    {{- include "eric-oss-dmm.service-mesh-ism2osm-labels" .| nindent 4 }}
+  annotations:
+    {{- include "eric-oss-dmm.service-mesh-inject" .| nindent 4 }}
+    {{- include "eric-oss-dmm.service-mesh-volume" .| nindent 4 }}
+spec:
+  volumes:
+    - name: "{{ .Chart.Name }}-reports"
+      emptyDir: {}
+    - name: "{{ .Chart.Name }}-logs"
+      emptyDir: {}
+    - name: testware-config
+      configMap:
+        name: {{ .Chart.Name }}-testware-config 
+  containers:
+    - name: "{{ $.Chart.Name }}"
+      image: {{ $.Values.images.testwareImage | quote }}
+      env:
+        - name: "APP_VERSION"
+          value: "{{- include "get-application-version" . | trim | default "undefined" }}"
+        - name: "STAGING_TYPE"
+          value: {{ $.Values.env.STAGING_TYPE }}
+        - name: "PRODUCT"
+          value: {{ $.Values.env.PRODUCT }}
+        - name: "PRODUCT_VERSION"
+          value: "{{- include "get-product-version" . | trim | default "undefined" }}"
+        - name: "PM_SERVER"
+          value: "{{- include "get-pm-server-url" . | trim | default "undefined" }}"
+        - name: "ENVIRONMENT"
+          value: {{ $.Values.env.ENVIRONMENT }}
+        - name: "TARGET_NAMESPACE"
+          value: {{ $.Release.Namespace }}
+        - name: TARGET_CLUSTER
+          value: "{{ $.Values.env.TARGET_CLUSTER }}"
+        - name: "GAS_URL"
+          valueFrom:
+            configMapKeyRef:
+              name: testware-hostnames
+              key: gas
+        - name: "EIC_URL"
+          valueFrom:
+            configMapKeyRef:
+              name: testware-hostnames
+              key: eic
+        - name: "IAM_URL"
+          valueFrom:
+            configMapKeyRef:
+              name: testware-hostnames
+              key: iam
+        - name: "BOOTSTRAP_EXTERNAL"
+          valueFrom:
+            configMapKeyRef:
+              name: testware-hostnames
+              key: kafkaBootstrap
+        - name: "TLS"
+          valueFrom:
+            configMapKeyRef:
+              name: testware-global-config
+              key: tls-enabled
+        - name: "Namespace"
+          value: {{ .Release.Namespace }}
+        - name: "BUILD_URL"
+          value:  {{ $.Values.env.BUILD_URL }}
+        - name: OPTIONS_FILE
+          value: "{{- include "get-the-options-file" . | trim | default "undefined" }}"
+        - name: ADDITIONAL_ARGS        
+          value: {{ $.Values.env.ADDITIONAL_ARGS }}
+        - name: KAFKA_SERVER        
+          value: "{{- include "get-TLS-environment" . | trim | default "undefined" }}"
+        - name: "TESTWARE_NAME"
+          value: {{ $.Values.env.TESTWARE_NAME }}
+        - name: "LOAD_PERCENTAGE"
+          value: "{{ $.Values.env.LOAD_PERCENTAGE }}"
+        - name: KAFKA_USER
+          value: {{ .Chart.Name }}
+        - name: "CLIENT_ID"
+          value: "{{ index .Values "kafka-wrapper" "env" "CLIENT_ID" }}"
+        - name: "APP_CLIENT_ID"
+          value: "{{ index .Values "env" "CLIENT_ID" }}"
+        - name: "APP_CLIENT_PSW"
+          value: "{{ index .Values "env" "CLIENT_PSW" }}"
+        - name: "MESSAGE_COUNT"
+          value: "{{ index .Values "kafka-wrapper" "kafka" "totalmessage" }}"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: testware-resources-secret
+              key: database_url
+        - name: K6_TOOL_GUI_URL
+          valueFrom:
+            secretKeyRef:
+              name: testware-resources-secret
+              key: gui_url
+        - name: API_URL
+          valueFrom:
+            secretKeyRef:
+              name: testware-resources-secret
+              key: api_url
+        - name: KC_ADMIN_ID
+          valueFrom:
+            secretKeyRef:
+              name: eric-sec-access-mgmt-creds
+              key: kcadminid
+        - name: KC_PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: eric-sec-access-mgmt-creds
+              key: kcpasswd
+        - name: TESTWARE_CONFIG_FILE
+          value: /testware/config/testware-config.json
+        - name: "K6_ENABLE_KAFKA_OUTPUT"
+          value: "{{ index .Values "env" "K6_ENABLE_KAFKA_OUTPUT" }}"
+        - name: K6_KAFKA_OUTPUT_SETTINGS
+          valueFrom:
+            secretKeyRef:
+              name: testware-resources-secret
+              key: kafka_config
+      volumeMounts:
+        - name: "{{ $.Chart.Name }}-reports"
+          mountPath: "/reports"
+        - name: "{{ .Chart.Name }}-logs"
+          mountPath: "/var/log"
+        - name: testware-config
+          mountPath: /testware/config
+      imagePullPolicy: Always
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: true
+        runAsNonRoot: false
+        runAsUser: 0
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+  dnsPolicy: ClusterFirst
+  imagePullSecrets:
+    - name: k8s-registry-secret
+  schedulerName: default-scheduler
+  restartPolicy: Never
+  securityContext: {}
+  terminationGracePeriodSeconds: 5

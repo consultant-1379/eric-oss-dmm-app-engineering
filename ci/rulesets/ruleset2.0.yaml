@@ -1,0 +1,194 @@
+modelVersion: 2.0
+description: "Middleman: dmm k6 testsuite Pipeline"
+docker-images:
+  - bob-py3-kube-helm-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-py3kubehelmbuilder:latest
+  - testware-cli: armdocker.rnd.ericsson.se/proj-eric-oss-dev-test/k6-reporting-tool-cli:latest
+properties:
+  - testsuite-dir: .
+  - testsuite-image-name: k6-dmm-testsuite
+  - kube-config-path: ./admin.conf
+  - DMM-TESTWARE-NAME: eric-oss-dmm-app-test
+  - REPO: dmm-app-test
+  - TESTWARE_PATH: https://arm.seli.gic.ericsson.se/artifactory/proj-eric-oss-drop-helm-local
+
+env:
+  - PWD
+  - HOME
+  - KUBECONFIG 
+  - NAMESPACE
+  - BUILD_DIR (default=./build)
+  - HA_INFO_FILE (default=${env.BUILD_DIR}/ha-info.log)
+  - GAS_HOSTNAME
+  - BUILD_URL
+  - FUNCTIONAL_USER_USERNAME
+  - FUNCTIONAL_USER_PASSWORD
+  - KAFKA_HOSTNAME
+  - IAM_HOSTNAME
+
+
+  
+var:
+  - helm-chart-directory
+  - id
+
+rules:
+
+  deploy-testware:
+    - task: deploy-testwaree
+      cmd:
+        - helm repo remove ${REPO} || true 
+        - helm repo add ${REPO} ${TESTWARE_PATH} --username ${env.FUNCTIONAL_USER_USERNAME} --password ${env.FUNCTIONAL_USER_PASSWORD}
+        - helm install ${DMM-TESTWARE-NAME} ${REPO}/${DMM-TESTWARE-NAME} --version "" --namespace ${env.NAMESPACE} --set env.BUILD_URL=${env.BUILD_URL} --set env.GAS_URL=${env.GAS_HOSTNAME} --set env.ENVIRONMENT=production --set env.KAFKA_SERVER=eric-oss-dmm-kf-op-sz-kafka-bootstrap:9093 --set env.TLS=true --set kafka-wrapper.enabled=true --set kafka-wrapper.kafka.bootstrap_servers=eric-oss-dmm-kf-op-sz-kafka-bootstrap:9093  --set kafka-wrapper.KafkaIngressWrapper.enable=true --set kafka-wrapper.env.BOOTSTRAP_EXTERNAL=${env.KAFKA_HOSTNAME} --set kafka-wrapper.env.IAM_URI=${env.IAM_HOSTNAME} --set kafka-wrapper.env.TLS=true
+
+  deploy-non-tls-testware:
+    - task: deploy-testwaree
+      cmd:
+        - helm repo remove ${REPO} || true 
+        - helm repo add ${REPO} ${TESTWARE_PATH} --username ${env.FUNCTIONAL_USER_USERNAME} --password ${env.FUNCTIONAL_USER_PASSWORD}
+        - helm install ${DMM-TESTWARE-NAME} ${REPO}/${DMM-TESTWARE-NAME} --version "" --namespace ${env.NAMESPACE} --set env.BUILD_URL=${env.BUILD_URL} --set env.GAS_URL=${env.GAS_HOSTNAME} --set env.KAFKA_SERVER=eric-oss-dmm-kf-op-sz-kafka-bootstrap:9092 --set env.TLS=false
+  create-job:
+    - task: create-job
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli create-job --jenkins-url ${env.BUILD_URL} --timeout 3600
+
+  create-non-tls-job:
+    - task: create-job
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli create-job --jenkins-url ${env.BUILD_URL} --development --timeout 3600
+  wait-testware:
+    - task: wait-testware
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli wait-testware --url ${env.BUILD_URL} --path ${env.PWD} --delay 30 --retries 40
+
+  check-rate:
+    - task: check-rate
+      cmd: 
+        - chmod +x ${env.PWD}/ci/scripts/rate_check.sh
+        - ${env.PWD}/ci/scripts/rate_check.sh ${env.PWD}
+      
+  wait-non-tls-testware:
+    - task: wait-testware
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli wait-testware --url ${env.BUILD_URL} --development --path ${env.PWD} --delay 30 --retries 40
+
+  collect-log:
+    - task: collect-pod-log
+      cmd: kubectl logs ${DMM-TESTWARE-NAME} --namespace ${env.NAMESPACE} >${env.PWD}/${DMM-TESTWARE-NAME}.log
+    - task: collect-http-log
+      cmd: 
+        - kubectl cp ${env.NAMESPACE}/${DMM-TESTWARE-NAME}:/var/log/eric-oss-dmm-testware.log ${env.PWD}/var/log/eric-oss-dmm-testware-http.log || true
+        - tar -czf eric-oss-dmm-testware-http.tgz var/log/eric-oss-dmm-testware-http.log || true
+    - task: get-id
+      cmd: grep id execution-status.properties | cut -c4- > .bob/var.id
+    - task: collect-log-k6
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli download-log --id ${var.id} --type k6 --path ${env.PWD}
+    - task: collect-log-summary
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli download-log --id ${var.id} --type summary --path ${env.PWD}
+
+  collect-non-tls-log:
+    - task: collect-pod-log
+      cmd: kubectl logs ${DMM-TESTWARE-NAME} --namespace ${env.NAMESPACE} -c ${DMM-TESTWARE-NAME} >${env.PWD}/${DMM-TESTWARE-NAME}.log
+    - task: collect-http-log
+      cmd: 
+        - kubectl cp ${env.NAMESPACE}/${DMM-TESTWARE-NAME}:/var/log/eric-oss-dmm-testware.log ${env.PWD}/var/log/eric-oss-dmm-testware-http.log || true
+        - tar -czf eric-oss-dmm-testware-http.tgz var/log/eric-oss-dmm-testware-http.log || true
+    - task: get-id
+      cmd: grep id execution-status.properties | cut -c4- > .bob/var.id
+    - task: collect-log-k6
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli download-log --id ${var.id} --development --type k6 --path ${env.PWD}
+    - task: collect-log-summary
+      docker-image: testware-cli
+      docker-flags:
+        - "-t"
+        - "-v ${env.PWD}:${env.PWD}"
+        - "--user $(id -u):$(id -g)"
+      cmd: 
+        - testware-cli download-log --id ${var.id} --development --type summary --path ${env.PWD}
+
+  uninstall-testware:
+   - task: uninstall-testware
+     cmd: helm uninstall ${DMM-TESTWARE-NAME} --namespace ${env.NAMESPACE}
+  build-image:
+    - task: build-image
+      cmd: ${env.PWD}/deployment/docker/buildImage.sh 
+      
+  ha-test:
+    - rule: hacompatibilitycheck 
+
+  hacompatibilitycheck:
+    - task: create-build-dir
+      cmd: mkdir -p ${env.BUILD_DIR}
+    - task: hacompatibilitycheck
+      cmd:
+        - chmod 755 ${env.PWD}/ci/scripts/hacompatibilitycheck_schema_registry.sh
+        - echo -e 'HA Compatibility Test Starts:' >> ${env.HA_INFO_FILE}
+        - ${env.PWD}/ci/scripts/hacompatibilitycheck_schema_registry.sh ${env.NAMESPACE} >> ${env.HA_INFO_FILE}
+        - echo -e 'HA Compatibility Test Ends:' >> ${env.HA_INFO_FILE}
+        
+  copy-testsuite-report:
+    - task: copy-testsuite-report
+      cmd:
+        - chmod +x ${env.PWD}/ci/scripts/copy_report_k6.sh
+        - ${env.PWD}/ci/scripts/copy_report_k6.sh ${kube-config-path} ${env.NAMESPACE} ${env.PWD}
+  collect-adp-log: 
+    - task: collect-adp-log
+      cmd:
+        - chmod +x ${env.PWD}/ci/scripts/ADP_logs.sh
+        - ${env.PWD}/ci/scripts/ADP_logs.sh ${env.NAMESPACE}
+  copy-html-report:
+    - task: copy-html-report
+      cmd: kubectl cp ${env.NAMESPACE}/k6-testsuite:/home/k6/scripts/eric-oss-dmm-k6-report.html ${env.PWD}/eric-oss-dmm-k6-report.html
+  truncate-db-data:
+    - task: truncate-db-data
+      cmd: kubectl exec eric-dmm-common-db-1 -n ${env.NAMESPACE} -- bash -c "psql -U postgres -d catalog -c 'TRUNCATE bulk_data_repository, data_collector, message_data_topic, message_status_topic, data_provider_type, data_space, file_format, message_bus, message_schema, notification_topic RESTART IDENTITY CASCADE;'"
+  delete-k6-pod:
+    - task: delete-k6-pod
+      cmd: kubectl --namespace ${env.NAMESPACE} delete pod k6-testsuite
+  build-testsuite-image:
+    - task: docker-build
+      cmd: docker build ${env.PWD}/${testsuite-dir}
+        --tag ${testsuite-image-name}:latest
+  deploy-tls-testsuite:
+    - task: deploy-testsuite
+      cmd:
+        - chmod +x ${env.PWD}/ci/scripts/deploy_tls_testsuite.sh
+        - ${env.PWD}/ci/scripts/deploy_tls_testsuite.sh ${kube-config-path} ${env.NAMESPACE} ${env.PWD} ${env.GAS_HOSTNAME}
+ 

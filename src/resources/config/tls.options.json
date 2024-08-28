@@ -1,0 +1,32 @@
+{
+    "insecureSkipTLSVerify": true,
+      "scenarios": {
+        "data_catalog_get_24_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_get_internal",
+          "vus": 1,
+          "iterations": 1
+        },
+        "kafka_native_produce_internal": {
+          "exec": "kafka_native_produce_internal",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "iterations": 1
+        },
+        "strimzi_bridge_produce_message_external": {
+            "exec": "strimzi_bridge_produce_message_external",        
+            "executor": "per-vu-iterations",
+            "vus": 1,
+            "iterations": 1
+          },
+          "schema_registery_internal": {
+            "exec": "schema_registry_register_schema_internal",        
+            "executor": "per-vu-iterations",
+            "vus": 1,
+            "iterations": 1
+          }
+        
+    
+      }
+    
+    }

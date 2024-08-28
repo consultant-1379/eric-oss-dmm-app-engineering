@@ -1,0 +1,59 @@
+#COPYRIGHT Ericsson 2021
+#The copyright to the computer program(s) herein is the property of
+#Ericsson Inc. The programs may be used and/or copied only with written
+#permission from Ericsson Inc. or in accordance with the terms and
+#conditions stipulated in the agreement/contract under which the
+#program(s) have been supplied.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: k6-testsuite
+  labels:
+    app: k6-testsuite
+    eric-mesh-controller-access: "true"
+    eric-oss-dmm-kf-op-sz-kafka-ism-access: "true"
+    security.istio.io/tlsMode: istio
+    service-istio-secure: "true"
+    service.istio.io/canonical-name: eric-oss-dmm-app-test
+    service.istio.io/canonical-revision: "1.0"
+    sidecar.istio.io/inject: "true"
+  annotations:
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/userVolume: '{"eric-oss-dmm-app-test-kafka-certs-tls":{"secret":{"secretName":"eric-oss-dmm-app-test-secret","optional":true}},"eric-oss-dmm-app-test-certs-ca-tls":{"secret":{"secretName":"eric-sec-sip-tls-trusted-root-cert"}}}'
+    sidecar.istio.io/userVolumeMount: '{"eric-oss-dmm-app-test-kafka-certs-tls":{"mountPath":"/etc/istio/tls/eric-oss-dmm-kf-op-sz-kafka-bootstrap/","readOnly":true},"eric-oss-dmm-app-test-certs-ca-tls":{"mountPath":"/etc/istio/tls-ca","readOnly":true}}'
+spec:
+      containers:
+        - name: k6base
+          env:
+            - name: GAS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: gas-configmap
+                  key: GAS_URL
+            - name: Namespace
+              valueFrom:
+                configMapKeyRef:
+                  name: ns-configmap
+                  key: NAMESPACE
+            - name: OPTIONS_FILE
+              value: "/home/k6/scripts/config/tls.options.json"
+            - name: KAFKA_SERVER
+              value: "eric-oss-dmm-kf-op-sz-kafka-bootstrap:9093"
+            - name: K6_OUT
+              value: "json=test-output.json"
+          image: armdocker.rnd.ericsson.se/proj-edca-dev/k6-dmm-testsuite:1.0.2-160
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsNonRoot: false
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: k8s-registry-secret
+      schedulerName: default-scheduler
+      restartPolicy: Never
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

@@ -1,0 +1,40 @@
+replicaCount: 1
+images:
+  testwareImage: ${defaultDockerTag}
+build:
+  version: ${version}
+  name: ${name}
+env:
+  BUILD_URL: ""
+  STAGING_TYPE: "APPLICATION"
+  PRODUCT: ""
+  ENVIRONMENT: "development"
+  TESTWARE_NAME: "eric-oss-dmm-app-test"
+  TEST_VERSION: ${version} 
+  LOAD_PERCENTAGE: 100
+  SEF_ENABLED_TESTS: true
+  CLIENT_ID: app-engid--2--cc2f1b88-add3-43ea-8482-de8e23c226df
+  CLIENT_PSW: 123456
+  TARGET_CLUSTER: ""
+  K6_ENABLE_KAFKA_OUTPUT: false
+  K6_KAFKA_OUTPUT_SETTINGS: brokers=kroto017.rnd.gic.ericsson.se:30002,topic=k6-samples-rpt-dev,format=json
+
+kafka-wrapper:
+  enabled: false
+  kafka:
+    bootstrap_servers: eric-oss-dmm-kf-op-sz-kafka-bootstrap:9092
+    # Topic count will be a same replica count
+    topicCount: 3
+    # Each replica will produce/consume =  {messageCount}/{topicCount}
+    messageCount: "9000000"
+    totalmessage: "36000000"
+    messageSize: "1000"
+    load: true
+  KafkaIngressWrapper:
+    enable: false
+  env:
+    BOOTSTRAP_EXTERNAL: ""
+    IAM_URI: ""
+    CLIENT_ID: app-engid--1--cc2f1b88-add3-43ea-8482-de8e23c226de
+    CLIENT_PSW: 123456
+    TLS: false

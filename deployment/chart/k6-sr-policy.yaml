@@ -1,0 +1,22 @@
+#COPYRIGHT Ericsson 2021
+#The copyright to the computer program(s) herein is the property of
+#Ericsson Inc. The programs may be used and/or copied only with written
+#permission from Ericsson Inc. or in accordance with the terms and
+#conditions stipulated in the agreement/contract under which the
+#program(s) have been supplied.
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: k6-eric-schema-registry-sr-policy
+  labels:
+    app: eric-schema-registry-sr
+spec:
+  podSelector:
+    matchLabels:
+      app: eric-schema-registry-sr
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: k6-testsuite

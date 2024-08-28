@@ -1,0 +1,127 @@
+{
+    "characteristics": {
+      "pmServerUrl": "https://${__ENV.GAS_URL}/metrics/viewer",
+      "metrics": [
+        {
+          "description": "Data catalog CPU Usage",
+          "microservice": {"name": "eric-oss-data-catalog", "displayName": "Data Catalog"},
+          "query": "(rate(container_cpu_usage_seconds_total{container='eric-oss-data-catalog'}[{{test_duration_in_seconds}}]) / on(pod, container) (container_spec_cpu_quota{container='eric-oss-data-catalog'} / container_spec_cpu_period{container='eric-oss-data-catalog'})) * 100",
+          "thresholds": [
+            {
+              "operator": "LESS_OR_EQUAL_TO",
+              "value": 90,
+              "legacy": false
+            }
+          ]
+        },
+        {
+            "description": "Data catalog Memory Usage",
+            "microservice": {"name": "eric-oss-data-catalog", "displayName": "Data Catalog"},
+            "query": "container_memory_working_set_bytes{container='eric-oss-data-catalog'} / container_spec_memory_limit_bytes{container='eric-oss-data-catalog'} * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Schema registry CPU Usage",
+            "microservice": {"name": "eric-schema-registry-sr", "displayName": "Schema registry"},
+            "query": "(rate(container_cpu_usage_seconds_total{container='eric-schema-registry-sr'}[{{test_duration_in_seconds}}]) / on(pod, container) (container_spec_cpu_quota{container='eric-schema-registry-sr'} / container_spec_cpu_period{container='eric-schema-registry-sr'})) * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Schema registry Memory Usage",
+            "microservice": {"name": "eric-schema-registry-sr", "displayName": "Schema registry"},
+            "query": "container_memory_working_set_bytes{container='eric-schema-registry-sr'} / container_spec_memory_limit_bytes{container='eric-schema-registry-sr'} * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Kafka Resource Manager CPU Usage",
+            "microservice": {"name": "eric-oss-kf-resource-manager", "displayName": "Kafka Resource Manager"},
+            "query": "(rate(container_cpu_usage_seconds_total{container='eric-oss-kf-resource-manager'}[{{test_duration_in_seconds}}]) / on(pod, container) (container_spec_cpu_quota{container='eric-oss-kf-resource-manager'} / container_spec_cpu_period{container='eric-oss-kf-resource-manager'})) * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Kafka Resource Manager Memory Usage",
+            "microservice": {"name": "eric-oss-kf-resource-manager", "displayName": "Kafka Resource Manager"},
+            "query": "container_memory_working_set_bytes{container='eric-oss-kf-resource-manager'} / container_spec_memory_limit_bytes{container='eric-oss-kf-resource-manager'} * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Data collection controller CPU Usage",
+            "microservice": {"name": "eric-oss-data-collection-controller", "displayName": "Data collection controller"},
+            "query": "(rate(container_cpu_usage_seconds_total{container='eric-oss-data-collection-controller'}[{{test_duration_in_seconds}}]) / on(pod, container) (container_spec_cpu_quota{container='eric-oss-data-collection-controller'} / container_spec_cpu_period{container='eric-oss-data-collection-controller'})) * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Data collection controller Memory Usage",
+            "microservice": {"name": "eric-oss-data-collection-controller", "displayName": "Data collection controller"},
+            "query": "container_memory_working_set_bytes{container='eric-oss-data-collection-controller'} / container_spec_memory_limit_bytes{container='eric-oss-data-collection-controller'} * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Strimzi Kafka Operator CPU Usage",
+            "microservice": {"name": "eric-oss-dmm-kf-op-sz-kafka", "displayName": "Strimzi Kafka Operator"},
+            "query": "(rate(container_cpu_usage_seconds_total{container='eric-oss-dmm-kf-op-sz-kafka-exporter'}[{{test_duration_in_seconds}}]) / on(pod, container) (container_spec_cpu_quota{container='eric-oss-dmm-kf-op-sz-kafka-exporter'} / container_spec_cpu_period{container='eric-oss-dmm-kf-op-sz-kafka-exporter'})) * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          },
+          {
+            "description": "Strimzi Kafka Operator Memory Usage",
+            "microservice": {"name": "eric-oss-dmm-kf-op-sz-kafka", "displayName": "Strimzi Kafka Operator"},
+            "query": "container_memory_working_set_bytes{container='eric-oss-dmm-kf-op-sz-kafka-exporter'} / container_spec_memory_limit_bytes{container='eric-oss-dmm-kf-op-sz-kafka-exporter'} * 100",
+            "thresholds": [
+              {
+                "operator": "LESS_OR_EQUAL_TO",
+                "value": 90,
+                "legacy": false
+              }
+            ]
+          }
+      ]
+    }
+  }

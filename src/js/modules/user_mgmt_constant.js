@@ -1,0 +1,1 @@
+export const newUserName = `${__ENV.APP_ENGG_USER_NAME}`;

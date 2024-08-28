@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "dataProviderTypeId": 1,
+  "reportOutputPeriodList": [15],
+  "dataEncoding": "XML",
+  "specificationReference": "specref1",
+  "notificationTopicId": 1,
+  "bulkDataRepositoryId": 1,
+  "dataCollectorId": "d65f5310-1593-4ae1-9f1d-ab9104180f01"
+}

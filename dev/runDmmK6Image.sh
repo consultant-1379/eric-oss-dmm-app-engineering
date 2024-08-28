@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run -it armdocker.rnd.ericsson.se/proj-edca-dev/k6-dmm-testsuite:1.0.0-31 -e CATALOG_URL=http://chart-example.local/catalog/v1/ -e DMAAP_URL=http://ingress.local/ -e SR_URL=http://eric-schema-registry-sr/

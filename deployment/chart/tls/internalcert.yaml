@@ -1,0 +1,17 @@
+apiVersion: siptls.sec.ericsson.com/v1
+kind: InternalCertificate
+metadata:
+  name: eric-oss-dmm-app-test-int-cert
+spec:
+  certificate:
+    extendedKeyUsage:
+      tlsClientAuth: true
+      tlsServerAuth: false
+    issuer:
+      reference: eric-oss-dmm-kf-op-sz-clients-ca-cert
+    subject:
+      cn: eric-oss-dmm-app-test
+  kubernetes:
+    certificateName: cert.pem
+    generatedSecretName: eric-oss-dmm-app-test-secret
+    privateKeyName: key.pem

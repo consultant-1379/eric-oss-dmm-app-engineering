@@ -1,0 +1,303 @@
+{
+    "insecureSkipTLSVerify": true,
+    "teardownTimeout": "180s",
+    "setupTimeout": "180s",
+      "thresholds": {
+        "Register fileformat and message schema{scenario:data_catalog_register_file_format_4_user_internal}": ["avg<3000"],
+        "Delete data catalog{scenario:data_catalog_register_delete_40_internal}": ["avg<1500"],
+        "Query from data catalog{scenario:data_catalog_get_24_user_internal}": ["avg<1000"],
+        "Query from data catalog{scenario:data_catalog_get_24_user_external}": ["avg<1500"],
+        "Post to data catalog{scenario:data_catalog_post_14_user_internal}": ["avg<1000"],
+        "Creating Subscription": ["avg<40000"],
+        "Updating predicate parameter for subscription":["avg<30000"],
+        "Deleting subscription":["avg<10000"],
+        "Register_new_schema{scenario:schema_registry_register_5_schemas_internal}": [
+          "rate >= 5" 
+        ],
+        "Get_schema_string_by_input_id{scenario:schema_registry_get_60_external}": [
+          "rate >= 60"
+        ],
+        "Get_schema_string_by_version{scenario:schema_registry_get_60_external}": [
+          "rate >= 7"
+        ],
+        "Get_schema_string_by_version{scenario:schema_registry_get_60_internal}": [
+          "rate >= 7"
+        ],
+        "Consume Message from kafka through internal host":["p(95)<1000"],
+        "Produce Message to kafka through internal host":["p(95)<1000"],
+        "Consume Message from kafka through external host":["p(95)<1000"],
+        "Produce Message to kafka through external host":["p(95)<1000"],
+        "Consume Message from kafka":["p(95)>25000"],
+        "Produce Message to kafka":["p(95)>25000"]
+  
+      },
+  
+      "scenarios": {
+        "schema_registry_delete_subject_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "schema_registry_delete_subject_internal",
+          "vus": 1,
+          "iterations": 1,
+          "maxDuration": "30s"
+        },
+        "data_collection_update_on_hold_subscriptions_external": {
+          "exec": "data_collection_update_on_hold_subscriptions_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "env": { "MYVAR": "DCC","GATEWAY": "SEF" },
+          "maxDuration": "100s",
+          "iterations": 1
+        },
+        "data_collection_create_thirty_subscriptions_external": {
+          "exec": "data_collection_create_thirty_subscriptions_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "env": { "MYVAR": "DCC","GATEWAY": "SEF" },
+          "maxDuration": "100s",
+          "iterations": 1
+        },
+        "data_collection_create_update_delete_subscription_external": {
+          "exec": "data_collection_create_update_delete_subscription_external",
+          "executor": "per-vu-iterations",
+          "vus": 50,
+          "env": { "MYVAR": "DCC","GATEWAY": "SEF"},
+          "maxDuration": "100s",
+          "iterations": 1
+        },
+        "data_catalog_register_file_format_4_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_register_internal",
+          "vus": 4,
+          "iterations": 1,
+          "env": { "MYVAR": "PUT" },
+          "startTime": "110s",
+          "maxDuration": "30s"
+        }, 
+        "data_catalog_get_24_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_get_internal",
+          "vus": 24,
+          "iterations": 1,
+          "maxDuration": "30s",        
+          "startTime": "120s"
+        },
+        "data_catalog_get_24_user_external": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_get_external",
+          "vus": 24,
+          "iterations": 1,
+          "env": { "GATEWAY": "SEF"},
+          "maxDuration": "30s",        
+          "startTime": "125s"
+        },
+        "data_catalog_post_14_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_post_internal",
+          "vus": 14,
+          "iterations": 1,
+          "maxDuration": "30s",
+          "startTime": "115s"
+        },
+        "data_catalog_register_file_format_max_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_register_internal",
+          "vus": 90,
+          "iterations": 1,
+          "env": { "MYVAR": "PUT" },  
+          "startTime": "175s"
+        },
+        "data_catalog_get_max_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_get_internal",
+          "vus": 200,
+          "iterations": 1,
+          "startTime": "300s"
+        },
+        "data_catalog_get_max_user_external": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_get_external",
+          "vus": 200,
+          "env": { "GATEWAY": "SEF"},
+          "iterations": 1,
+          "startTime": "330s"
+        },
+        "data_catalog_post_max_user_internal": {
+          "executor": "per-vu-iterations",
+          "exec": "data_catalog_post_internal",
+          "vus": 1000,
+          "iterations": 1,
+          "startTime": "215s"
+        },
+        "kafka_native_produce_internal": {
+          "exec": "kafka_native_produce_internal",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "300s",
+          "iterations": 1
+        },
+        "kafka_native_consume_external": {
+          "exec": "kafka_native_consume_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "300s",
+          "iterations": 1
+        },
+        "schema_registry_register_900_schemas_internal": {
+          "exec": "schema_registry_register_schema_internal",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "360s",
+          "iterations": 900
+        },
+        "schema_registry_register_5_schemas_internal": {
+          "exec": "schema_registry_register_schema_internal",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "300s",
+          "iterations": 100
+        },
+        "schema_registry_get_60_internal": {
+          "exec": "schema_registry_retrieve_schema_internal",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "360s",
+          "iterations": 400
+        },
+        "schema_registry_get_60_external": {
+          "exec": "schema_registry_retrieve_schema_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "env": { "GATEWAY": "SEF"},
+          "startTime": "300s",
+          "iterations": 400
+        },
+        "alarm_management_check_external": {
+          "exec": "alarm_management_check_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "env": { "GATEWAY": "SEF"},
+          "startTime": "10s",
+          "iterations": 1
+        },
+        "kafka_consume_external": {
+          "exec": "kafka_consume_external",
+          "executor": "per-vu-iterations",
+          "vus": 1,
+          "startTime": "80s",
+          "iterations": 1
+      },
+      "kafka_produce_external": {
+        "exec": "kafka_produce_external",
+        "executor": "per-vu-iterations",
+        "vus": 1,
+        "startTime": "80s",
+        "iterations": 1
+    },
+      "object_storage_manager_post_internal": {
+        "executor": "per-vu-iterations",
+        "exec": "object_storage_manager_post_internal",
+        "vus": 1,
+        "iterations": 1,
+        "maxDuration": "30s",
+        "startTime": "1s"
+      },
+      "object_storage_manager_delete_internal": {
+        "exec": "object_storage_manager_delete_internal",
+        "executor": "per-vu-iterations",
+        "vus": 1,
+        "startTime": "110s",
+        "iterations": 1
+     },
+     "object_storage_manager_get_internal": {
+      "executor": "per-vu-iterations",
+      "exec": "object_storage_manager_get_internal",
+      "vus": 1,
+      "iterations": 1,
+      "maxDuration": "30s",        
+      "startTime": "125s"
+    },
+    "functional_usecases_external": {
+      "exec": "functional_usecases_external",
+      "executor": "per-vu-iterations",
+      "vus": 1,
+      "startTime": "5s",
+      "iterations": 1,
+      "env": { "GATEWAY": "APIGW" }
+  },
+  "data_catalog_register_delete_40_internal": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_delete_internal",
+    "vus": 40,
+    "iterations": 1,
+    "env": { "MYVAR": "DELETE" },
+    "startTime": "140s",
+    "maxDuration": "30s"
+  },
+  "data_catalog_register_delete_max_user_internal": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_delete_internal",
+    "vus": 200,
+    "env": { "MYVAR": "DELETE" },
+    "startTime": "270s",
+    "iterations": 1
+  },
+  "kafka_usecase": {
+    "executor": "per-vu-iterations",
+    "exec": "kafka_usecase",
+    "vus": 1,
+    "iterations": 1,
+    "startTime": "30s",
+    "maxDuration": "1200s"
+  },
+  "data_catalog_post_50_user_r1standard_internal": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_post_internal",
+    "vus": 50,
+    "iterations": 1,
+    "maxDuration": "30s",
+    "startTime": "1s"
+  },
+  "data_catalog_get_50_user_r1standard_internal": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_get_internal",
+    "vus": 50,
+    "iterations": 1,
+    "maxDuration": "30s",
+    "startTime": "120s"
+  },
+  "data_catalog_get_50_user_r1standard_external": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_get_external",
+    "vus": 50,
+    "iterations": 1,
+    "env": { "GATEWAY": "SEF"},
+    "maxDuration": "30s",
+    "startTime": "180s"
+  },
+  "data_catalog_delete_50_user_r1standard_delete": {
+    "executor": "per-vu-iterations",
+    "exec": "data_catalog_delete_internal",
+    "vus": 50,
+    "iterations": 1,
+    "maxDuration": "30s",
+    "startTime": "200s"
+  },
+  "data_collection_post_ODS_50_user_internal": {
+    "exec": "data_collection_post_internal",
+    "executor": "per-vu-iterations",
+    "vus": 50,
+    "maxDuration": "30s",
+    "iterations": 1,
+    "startTime": "20s"
+  }, 
+  "data_collection_delete_ODS_50_user_internal": {
+    "exec": "data_collection_delete_internal",
+    "executor": "per-vu-iterations",
+    "vus": 50,
+    "maxDuration": "30s",
+    "iterations": 1,
+    "startTime": "50s"
+  }
+      }
+    
+    }

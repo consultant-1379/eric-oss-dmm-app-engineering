@@ -1,0 +1,39 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  labels:
+    service-istio-secure: "true"
+    strimzi.io/cluster: eric-oss-dmm-kf-op-sz
+  name: eric-oss-dmm-app-test
+spec:
+  authentication:
+    type: tls-external
+  authorization:
+    acls:
+    - operation: Write
+      resource:
+        name: '*'
+        patternType: literal
+        type: topic
+    - operation: Describe
+      resource:
+        name: '*'
+        patternType: literal
+        type: topic
+    - operation: Create
+      resource:
+        name: '*'
+        patternType: literal
+        type: topic
+    - operation: Delete
+      resource:
+        name: '*'
+        patternType: literal
+        type: topic
+    - operation: Read
+      resource:
+        name: '*'
+        patternType: literal
+        type: topic
+    type: simple
+

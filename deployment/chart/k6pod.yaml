@@ -1,0 +1,85 @@
+#COPYRIGHT Ericsson 2021
+#The copyright to the computer program(s) herein is the property of
+#Ericsson Inc. The programs may be used and/or copied only with written
+#permission from Ericsson Inc. or in accordance with the terms and
+#conditions stipulated in the agreement/contract under which the
+#program(s) have been supplied.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: k6-testsuite
+  labels:
+    app: k6-testsuite
+spec:
+      containers:
+        - name: k6base
+          env:
+            - name: GAS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: testware-hostnames
+                  key: gas
+            - name: EIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: testware-hostnames
+                  key: eic
+            - name: IAM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: testware-hostnames
+                  key: iam
+            - name: BOOTSTRAP_EXTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: testware-hostnames
+                  key: kafkaBootstrap
+            - name: "TLS"
+              valueFrom:
+                configMapKeyRef:
+                  name: testware-global-config
+                  key: tls-enabled
+            - name: CLIENT_ID
+              value: "app-engid--1--cc2f1b88-add3-43ea-8482-de8e23c226de"
+            - name: APP_CLIENT_ID
+              value: "app-engid--2--cc2f1b88-add3-43ea-8482-de8e23c226df"
+            - name: APP_CLIENT_PSW
+              value: "123456"
+            - name: Namespace
+              value: 1
+            - name: OPTIONS_FILE
+              value: "/home/k6/scripts/config/default.options.json"
+            - name: KAFKA_SERVER
+              value: "eric-oss-dmm-kf-op-sz-kafka-bootstrap:9092"
+            - name: K6_OUT
+              value: "json=test-output.json"
+            - name: LOAD_PERCENTAGE
+              value: "100"
+            - name: KC_ADMIN_ID
+              valueFrom:
+                secretKeyRef:
+                  name: eric-sec-access-mgmt-creds
+                  key: kcadminid
+            - name: KC_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: eric-sec-access-mgmt-creds
+                  key: kcpasswd
+          image: armdocker.rnd.ericsson.se/proj-eric-oss-dev-test/eric-oss-dmm-app-test:1.0.267-test-1
+          imagePullPolicy: IfNotPresent
+          command: ['sleep']
+          args: ['365d']
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsNonRoot: false
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: k8s-registry-secret
+      schedulerName: default-scheduler
+      restartPolicy: Never
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

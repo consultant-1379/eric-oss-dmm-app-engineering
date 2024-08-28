@@ -1,0 +1,7 @@
+{
+  "topicName":"test-topic",
+  "topicDescription":"test-topic",
+  "partitionCount":2,
+  "replicationCount":1,
+  "transactionEnabled":"false"
+}

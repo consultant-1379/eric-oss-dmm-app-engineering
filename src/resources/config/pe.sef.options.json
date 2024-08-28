@@ -1,0 +1,65 @@
+{
+    "teardownTimeout": "180s",
+    "setupTimeout": "180s",
+    "thresholds": {
+      "Creating Subscription": ["avg<40000"],
+      "Updating predicate parameter for subscription":["avg<30000"],
+      "Deleting subscription":["avg<10000"],
+      "Query from data catalog{scenario:data_catalog_get_24_user_external}": ["avg<1500"],
+      "Get_schema_string_by_version{scenario:schema_registry_get_60_external}": [
+        "rate >= 7"
+      ],
+      "Consume Message from kafka through internal host":["p(95)<1000"],
+      "Consume Message from kafka through external host":["p(95)<1000"],
+      "Produce Message to kafka through external host":["p(95)<1000"]
+    },
+      "insecureSkipTLSVerify": true,
+        "scenarios": {
+          "data_collection_create_update_delete_subscription_external": {
+            "exec": "data_collection_create_update_delete_subscription_external",
+            "executor": "per-vu-iterations",
+            "vus": 50,
+            "env": { "MYVAR": "DCC", "GATEWAY": "SEF"},
+            "iterations": 1
+          },
+          "data_catalog_get_24_user_external": {
+            "executor": "per-vu-iterations",
+            "exec": "data_catalog_get_external",
+            "vus": 24,
+            "env": { "GATEWAY": "SEF"},
+            "iterations": 1,
+            "maxDuration": "30s",
+            "startTime": "100s"
+          },
+          "data_catalog_get_max_user_external": {
+            "executor": "per-vu-iterations",
+            "exec": "data_catalog_get_external",
+            "vus": 200,
+            "env": { "GATEWAY": "SEF"},
+            "iterations": 1,
+            "startTime": "130s"
+          },
+            "schema_registry_get_60_external": {
+              "exec": "schema_registry_retrieve_schema_external",
+              "executor": "per-vu-iterations",
+              "vus": 1,
+              "env": { "GATEWAY": "SEF"},
+              "startTime": "180s",
+              "iterations": 400
+          },
+          "kafka_native_consume_external": {
+            "exec": "kafka_native_consume_external",
+            "executor": "per-vu-iterations",
+            "vus": 1,
+            "iterations": 1
+          },
+          "kafka_usecase": {
+            "executor": "per-vu-iterations",
+            "exec": "kafka_usecase",
+            "vus": 1,
+            "iterations": 1,
+            "startTime": "30s",
+            "maxDuration": "1200s"
+          }
+        }
+  }

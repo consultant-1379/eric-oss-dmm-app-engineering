@@ -1,0 +1,9 @@
+version: '3.4'
+services:
+  k6:
+    image: loadimpact/k6:latest
+    command: run -e CATALOG_URL=http://chart-example.local/catalog/v1/ -e DMAAP_URL=http://ingress.local/ -e SR_URL=http://eric-schema-registry-sr/ /scripts/DMMTestsuite.js
+    environment:
+      - K6_OUT=json=/scripts/test-output.json
+    volumes:
+      - ../scripts/:/scripts/

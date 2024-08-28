@@ -1,0 +1,5 @@
+{
+  "topicName":"test-topic",
+  "partitionCount":3,
+  "replicationCount":2
+}

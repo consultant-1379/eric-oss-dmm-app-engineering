@@ -1,0 +1,10 @@
+apiVersion: v2
+dependencies:
+  - condition: kafka-wrapper.enabled
+    name: kafka-wrapper
+    repository: https://arm.seli.gic.ericsson.se/artifactory/proj-eric-oss-drop-helm-local/
+    version: 1.0.51-2
+name: ${name}
+description: Testware for Data management movement test
+type: application
+version: ${version}

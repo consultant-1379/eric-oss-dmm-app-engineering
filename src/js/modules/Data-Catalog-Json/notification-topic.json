@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "messageBusId":1,
+  "name":"topic1",
+  "encoding":"JSON",
+  "specificationReference": "specref1",
+  "fileFormatIds": [1]
+}
